@@ -1,0 +1,223 @@
+/* would like to ignore ./src/pages/og-image/[slug].png.ts */
+@import "tailwindcss";
+/* config for tailwindcss-typography plugin */
+@config "../../tailwind.config.ts";
+
+/* use a selector-based strategy for dark mode */
+@variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* 1990s Synthwave BBS Theme */
+@theme {
+	/* Almost-black charcoal background */
+	--color-global-bg: #0e0e10;
+	--color-global-text: #e8e8ec;
+	/* Neon magenta - primary accent */
+	--color-link: #ff2a6d;
+	--color-accent: #ff2a6d;
+	/* Electric cyan - secondary accent */
+	--color-accent-2: #05d9e8;
+	/* Hot purple for quotes/highlights */
+	--color-quote: #d300c5;
+	/* Amber warmth for special elements */
+	--color-amber: #ffb800;
+	/* Dark charcoal borders/dividers */
+	--color-border: #2a2a2e;
+	/* Muted text */
+	--color-muted: #707078;
+}
+
+@layer base {
+	html {
+		color-scheme: dark;
+		accent-color: var(--color-accent);
+		scrollbar-gutter: stable;
+
+		&[data-theme="light"] {
+			color-scheme: light;
+			--color-global-bg: #f0f0ff;
+			--color-global-text: #1a1a2e;
+			--color-link: #c41e5c;
+			--color-accent: #c41e5c;
+			--color-accent-2: #0891a2;
+			--color-quote: #9b0096;
+			--color-border: #d0d0e0;
+			--color-muted: #666680;
+		}
+
+		&[data-theme="dark"] {
+			color-scheme: dark;
+		}
+	}
+
+	body {
+		font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+		font-size: 16px;
+		line-height: 1.7;
+		background: var(--color-global-bg);
+		min-height: 100vh;
+	}
+
+	/* Monospace for code and specific UI elements */
+	code, pre, .font-mono {
+		font-family: "IBM Plex Mono", "Fira Code", "Consolas", monospace;
+	}
+
+	/* Subtle scanline overlay effect */
+	body::before {
+		content: "";
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+		background: repeating-linear-gradient(
+			0deg,
+			transparent,
+			transparent 2px,
+			rgba(0, 0, 0, 0.03) 2px,
+			rgba(0, 0, 0, 0.03) 4px
+		);
+		z-index: 1000;
+	}
+
+	:target {
+		scroll-margin-block: 5ex;
+	}
+
+	@view-transition {
+		navigation: auto;
+	}
+
+	/* Astro image responsive styles */
+	:where([data-astro-image]) {
+		object-fit: var(--fit);
+		object-position: var(--pos);
+	}
+	[data-astro-image="full-width"] {
+		width: 100%;
+	}
+	[data-astro-image="constrained"] {
+		max-width: 100%;
+	}
+
+	/* Custom scrollbar */
+	::-webkit-scrollbar {
+		width: 8px;
+	}
+	::-webkit-scrollbar-track {
+		background: var(--color-global-bg);
+	}
+	::-webkit-scrollbar-thumb {
+		background: var(--color-border);
+		border-radius: 4px;
+	}
+	::-webkit-scrollbar-thumb:hover {
+		background: var(--color-accent);
+	}
+
+	/* Selection styling */
+	::selection {
+		background: var(--color-accent);
+		color: var(--color-global-bg);
+	}
+}
+
+@layer components {
+	@import "./components/admonition.css";
+	@import "./components/github-card.css";
+
+	.cactus-link {
+		@apply underline underline-offset-4 decoration-accent/50 hover:decoration-accent hover:decoration-2 transition-all duration-200;
+	}
+
+	.title {
+		@apply text-accent-2 text-2xl font-bold tracking-tight;
+		text-shadow: 0 0 20px rgba(5, 217, 232, 0.3);
+	}
+
+	/* BBS-style box */
+	.bbs-box {
+		border: 1px solid var(--color-border);
+		background: rgba(10, 10, 20, 0.6);
+		backdrop-filter: blur(4px);
+		padding: 1.5rem;
+		position: relative;
+	}
+
+	.bbs-box::before {
+		content: "";
+		position: absolute;
+		top: -1px;
+		left: 20px;
+		right: 20px;
+		height: 1px;
+		background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+	}
+
+	/* Neon glow text */
+	.neon-text {
+		text-shadow:
+			0 0 5px currentColor,
+			0 0 10px currentColor,
+			0 0 20px currentColor;
+	}
+
+	/* Terminal-style prompt */
+	.prompt::before {
+		content: ">";
+		color: var(--color-accent);
+		margin-right: 0.5rem;
+		font-weight: bold;
+	}
+
+	/* Glitch effect on hover */
+	.glitch-hover {
+		position: relative;
+		transition: all 0.1s ease;
+	}
+
+	.glitch-hover:hover {
+		text-shadow:
+			-1px 0 var(--color-accent),
+			1px 0 var(--color-accent-2);
+		animation: glitch 0.3s ease;
+	}
+
+	@keyframes glitch {
+		0%, 100% { transform: translate(0); }
+		20% { transform: translate(-2px, 1px); }
+		40% { transform: translate(2px, -1px); }
+		60% { transform: translate(-1px, 2px); }
+		80% { transform: translate(1px, -2px); }
+	}
+
+	/* Date styling - BBS timestamp look */
+	.bbs-date {
+		font-family: "IBM Plex Mono", monospace;
+		font-size: 0.75rem;
+		color: var(--color-muted);
+		letter-spacing: 0.05em;
+	}
+
+	/* Section divider */
+	.section-divider {
+		border: none;
+		height: 1px;
+		background: linear-gradient(90deg, var(--color-accent), var(--color-accent-2), var(--color-quote));
+		margin: 2rem 0;
+		opacity: 0.5;
+	}
+}
+
+@utility prose {
+	--tw-prose-body: var(--color-global-text);
+	--tw-prose-bold: var(--color-accent-2);
+	--tw-prose-bullets: var(--color-accent);
+	--tw-prose-code: var(--color-accent-2);
+	--tw-prose-headings: var(--color-accent-2);
+	--tw-prose-hr: 1px solid var(--color-border);
+	--tw-prose-links: var(--color-link);
+	--tw-prose-quotes: var(--color-quote);
+	--tw-prose-th-borders: var(--color-border);
+}
