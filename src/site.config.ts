@@ -27,7 +27,7 @@ export const siteConfig: SiteConfig = {
 	*/
 	title: "Gonzo Engineer",
 	// ! Please remember to replace the following site property with your own domain, used in astro.config.ts
-	url: "https://example.com",
+	url: "https://gonzo.engineer",
 };
 
 // Used to generate links in both the Header & Footer.
