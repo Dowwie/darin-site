@@ -13,7 +13,7 @@ const { as: Tag = "div", post, withDesc = false } = Astro.props;
 
 <div class="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-4 py-2 group">
 	<FormattedDate
-		class="text-xs font-mono text-[var(--color-muted)] tracking-wide shrink-0"
+		class="text-xs font-mono text-[var(--color-muted)] tracking-wide shrink-0 sm:w-24"
 		date={post.data.publishDate}
 	/>
 	<Tag class="flex-1">
