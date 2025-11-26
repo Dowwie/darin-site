@@ -1,8 +1,7 @@
 ---
-import { type CollectionEntry, getCollection } from "astro:content";
+import { type CollectionEntry } from "astro:content";
 import SocialList from "@/components/SocialList.astro";
 import PostPreview from "@/components/blog/PostPreview.astro";
-import Note from "@/components/note/Note.astro";
 import { getAllPosts } from "@/data/post";
 import PageLayout from "@/layouts/Base.astro";
 import { collectionDateSort } from "@/utils/date";
@@ -13,55 +12,20 @@ const allPosts = await getAllPosts();
 const allPostsByDate = allPosts
 	.sort(collectionDateSort)
 	.slice(0, MAX_POSTS) as CollectionEntry<"post">[];
-
-// Pinned Posts, set to a max of 3;
-const MAX_PINNED_POSTS = 3;
-const pinnedPosts = allPostsByDate.filter((p) => p.data.pinned).slice(0, MAX_PINNED_POSTS);
-
-// Notes
-const MAX_NOTES = 5;
-const allNotes = await getCollection("note");
-const latestNotes = allNotes.sort(collectionDateSort).slice(0, MAX_NOTES);
 ---
 
 <PageLayout meta={{ title: "Home" }}>
 	{/* Hero Section */}
 	<section class="relative mb-16">
-		<p class="text-lg mb-6 text-[var(--color-global-text)] leading-relaxed max-w-2xl">
-			I'm <span class="font-semibold text-[var(--color-accent-2)]">Darin Gordon</span> — I build
-			<span class="text-[var(--color-accent)]">AI agents</span>,
-			write <span class="text-[var(--color-accent-2)]">Python/Rust/Elixir</span>,
-			and think about where technology is headed.
+		<p class="text-lg mb-6 text-[var(--color-global-text)] leading-relaxed text-center max-w-2xl mx-auto">
+			Welcome to the era of <span class="font-bold text-[var(--color-accent)]">Gonzo Engineering:</span> what happens when the silos collapse, the agents take the wheel, and you are left holding the vision for a system you can no longer fully read.
 		</p>
-		<SocialList />
 	</section>
-
-	{/* Pinned Posts */}
-	{
-		pinnedPosts.length > 0 && (
-			<section class="mb-16">
-				<div class="flex items-center gap-3 mb-6">
-					<span class="text-[var(--color-accent)] font-mono text-sm">01</span>
-					<h2 class="text-sm font-semibold text-[var(--color-accent-2)] uppercase tracking-widest">
-						Pinned
-					</h2>
-					<div class="flex-1 h-px bg-[var(--color-border)]"></div>
-				</div>
-				<ul class="space-y-4" role="list">
-					{pinnedPosts.map((p) => (
-						<li class="border-l-2 border-[var(--color-accent)]/30 pl-4 hover:border-[var(--color-accent)] transition-colors">
-							<PostPreview post={p} />
-						</li>
-					))}
-				</ul>
-			</section>
-		)
-	}
 
 	{/* Recent Posts */}
 	<section class="mb-16">
 		<div class="flex items-center gap-3 mb-6">
-			<span class="text-[var(--color-accent)] font-mono text-sm">02</span>
+			<span class="text-[var(--color-accent)] font-mono text-sm">01</span>
 			<h2 class="text-sm font-semibold text-[var(--color-accent-2)] uppercase tracking-widest">
 				<a href="/posts/" class="hover:text-[var(--color-accent)] transition-colors">Posts</a>
 			</h2>
@@ -81,28 +45,8 @@ const latestNotes = allNotes.sort(collectionDateSort).slice(0, MAX_NOTES);
 		</ul>
 	</section>
 
-	{/* Notes */}
-	{
-		latestNotes.length > 0 && (
-			<section class="mb-16">
-				<div class="flex items-center gap-3 mb-6">
-					<span class="text-[var(--color-accent)] font-mono text-sm">03</span>
-					<h2 class="text-sm font-semibold text-[var(--color-accent-2)] uppercase tracking-widest">
-						<a href="/notes/" class="hover:text-[var(--color-accent)] transition-colors">Notes</a>
-					</h2>
-					<div class="flex-1 h-px bg-[var(--color-border)]"></div>
-					<a href="/notes/" class="text-xs text-[var(--color-muted)] hover:text-[var(--color-accent)] transition-colors font-mono">
-						view all
-					</a>
-				</div>
-				<ul class="space-y-6" role="list">
-					{latestNotes.map((note) => (
-						<li class="border-l-2 border-[var(--color-border)] pl-4 hover:border-[var(--color-quote)] transition-colors">
-							<Note note={note} as="h3" isPreview />
-						</li>
-					))}
-				</ul>
-			</section>
-		)
-	}
+	{/* Connect */}
+	<section class="mt-8">
+		<SocialList />
+	</section>
 </PageLayout>
