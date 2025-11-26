@@ -23,9 +23,9 @@ const socialLinks: {
 		name: "mdi:linkedin",
 	},
 	{
-		friendlyName: "Twitter",
-		link: "https://twitter.com/darin_gordon",
-		name: "mdi:twitter",
+		friendlyName: "X",
+		link: "https://x.com/darin_gordon",
+		name: "x",
 	},
 ];
 ---
@@ -44,12 +44,23 @@ const socialLinks: {
 						rel={`noreferrer ${isWebmention ? "me authn" : ""}`}
 						target="_blank"
 					>
-						<Icon
-							aria-hidden="true"
-							class="h-5 w-5 text-[var(--color-muted)] group-hover:text-[var(--color-accent)] transition-colors"
-							focusable="false"
-							name={name}
-						/>
+						{name === "x" ? (
+							<svg
+								aria-hidden="true"
+								class="h-5 w-5 text-[var(--color-muted)] group-hover:text-[var(--color-accent)] transition-colors"
+								fill="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+							</svg>
+						) : (
+							<Icon
+								aria-hidden="true"
+								class="h-5 w-5 text-[var(--color-muted)] group-hover:text-[var(--color-accent)] transition-colors"
+								focusable="false"
+								name={name}
+							/>
+						)}
 						<span class="sr-only">{friendlyName}</span>
 						{/* Hover glow effect */}
 						<div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-[var(--color-accent)]/5 blur-sm"></div>

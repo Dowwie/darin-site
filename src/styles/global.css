@@ -63,28 +63,7 @@
 		font-family: "IBM Plex Mono", "Fira Code", "Consolas", monospace;
 	}
 
-	/* Synthwave sun glow - positioned at horizon */
-	body::before {
-		content: "";
-		position: fixed;
-		top: 35%;
-		left: 0;
-		width: 100%;
-		height: 30%;
-		pointer-events: none;
-		z-index: -1;
-		background:
-			/* Sun disc at horizon */
-			radial-gradient(
-				ellipse 30% 50% at 50% 100%,
-				rgba(255, 42, 109, 0.06) 0%,
-				rgba(255, 42, 109, 0.04) 30%,
-				rgba(200, 0, 150, 0.02) 50%,
-				transparent 70%
-			);
-	}
-
-	/* Perspective grid floor - starts at horizon */
+	/* Perspective grid floor */
 	body::after {
 		content: "";
 		position: fixed;
@@ -98,24 +77,26 @@
 			/* Horizontal lines */
 			repeating-linear-gradient(
 				to bottom,
-				rgba(255, 42, 109, 0.02) 0px,
+				rgba(255, 42, 109, 0.28) 0px,
 				transparent 1px,
 				transparent 10%
 			),
 			/* Vertical lines - uniform opacity */
 			linear-gradient(to right,
-				transparent 0%, transparent 9%, rgba(255, 42, 109, 0.015) 9.5%, transparent 10%,
-				transparent 19%, rgba(255, 42, 109, 0.015) 19.5%, transparent 20%,
-				transparent 29%, rgba(255, 42, 109, 0.015) 29.5%, transparent 30%,
-				transparent 39%, rgba(255, 42, 109, 0.015) 39.5%, transparent 40%,
-				transparent 49%, rgba(255, 42, 109, 0.015) 49.5%, transparent 50%,
-				transparent 59%, rgba(255, 42, 109, 0.015) 59.5%, transparent 60%,
-				transparent 69%, rgba(255, 42, 109, 0.015) 69.5%, transparent 70%,
-				transparent 79%, rgba(255, 42, 109, 0.015) 79.5%, transparent 80%,
-				transparent 89%, rgba(255, 42, 109, 0.015) 89.5%, transparent 90%,
+				transparent 0%, transparent 9%, rgba(255, 42, 109, 0.06) 9.5%, transparent 10%,
+				transparent 19%, rgba(255, 42, 109, 0.06) 19.5%, transparent 20%,
+				transparent 29%, rgba(255, 42, 109, 0.06) 29.5%, transparent 30%,
+				transparent 39%, rgba(255, 42, 109, 0.06) 39.5%, transparent 40%,
+				transparent 49%, rgba(255, 42, 109, 0.06) 49.5%, transparent 50%,
+				transparent 59%, rgba(255, 42, 109, 0.06) 59.5%, transparent 60%,
+				transparent 69%, rgba(255, 42, 109, 0.06) 69.5%, transparent 70%,
+				transparent 79%, rgba(255, 42, 109, 0.06) 79.5%, transparent 80%,
+				transparent 89%, rgba(255, 42, 109, 0.06) 89.5%, transparent 90%,
 				transparent 100%);
 		transform: perspective(300px) rotateX(60deg);
 		transform-origin: center top;
+		mask-image: linear-gradient(to bottom, white 0%, white 60%, transparent 100%);
+		-webkit-mask-image: linear-gradient(to bottom, white 0%, white 60%, transparent 100%);
 	}
 
 	:target {
