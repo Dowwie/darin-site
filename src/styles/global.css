@@ -51,7 +51,7 @@
 
 	body {
 		font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-		font-size: 16px;
+		font-size: 18px;
 		line-height: 1.7;
 		background: var(--color-global-bg);
 		min-height: 100vh;
@@ -63,8 +63,9 @@
 		font-family: "IBM Plex Mono", "Fira Code", "Consolas", monospace;
 	}
 
-	/* Perspective grid floor */
+	/* Perspective grid floor - disabled for cleaner look */
 	body::after {
+		display: none;
 		content: "";
 		position: fixed;
 		top: 55%;
@@ -150,8 +151,16 @@
 	}
 
 	.title {
-		@apply text-accent-2 text-2xl font-bold tracking-tight;
+		@apply text-accent-2 text-4xl font-bold tracking-tight;
 		text-shadow: 0 0 20px rgba(5, 217, 232, 0.3);
+	}
+
+	.prose em {
+		color: #ffffff !important;
+	}
+
+	.prose blockquote strong {
+		color: #ffffff !important;
 	}
 
 	/* BBS-style box */
@@ -238,4 +247,8 @@
 	--tw-prose-links: var(--color-link);
 	--tw-prose-quotes: var(--color-quote);
 	--tw-prose-th-borders: var(--color-border);
+
+	em {
+		color: #ffffff;
+	}
 }

@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10XY: The Expanding Plane</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Instrument+Serif:ital@0;1&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0f;
+            color: #e8e4dd;
+            font-family: 'Space Mono', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        h1 {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #e8e4dd 0%, #a89f91 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #6b6560;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .visualization-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 80px;
+        }
+
+        @media (max-width: 900px) {
+            .visualization-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .viz-panel {
+            background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 24px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .viz-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        }
+
+        .panel-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: #4a4540;
+            margin-bottom: 16px;
+        }
+
+        .panel-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            margin-bottom: 12px;
+            color: #e8e4dd;
+        }
+
+        .panel-desc {
+            font-size: 0.85rem;
+            color: #6b6560;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        canvas {
+            width: 100%;
+            height: 350px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .x-panel .panel-title { color: #c4956a; }
+        .xy-panel .panel-title { color: #7ab8a8; }
+
+        .insight-section {
+            text-align: center;
+            padding: 80px 40px;
+            background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.02) 50%, transparent 100%);
+            margin-bottom: 60px;
+        }
+
+        .insight-text {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-style: italic;
+            color: #a89f91;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        .formula-section {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            margin-bottom: 80px;
+        }
+
+        .formula-card {
+            text-align: center;
+            padding: 32px 48px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px;
+        }
+
+        .formula-symbol {
+            font-family: 'Instrument Serif', serif;
+            font-size: 3rem;
+            margin-bottom: 12px;
+        }
+
+        .formula-card.x .formula-symbol { color: #c4956a; }
+        .formula-card.y .formula-symbol { color: #7ab8a8; }
+
+        .formula-label {
+            font-size: 0.8rem;
+            color: #6b6560;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        .formula-meaning {
+            font-size: 0.9rem;
+            color: #a89f91;
+            margin-top: 8px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        button {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 12px 24px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #a89f91;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.25);
+            color: #e8e4dd;
+        }
+
+        button.active {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.3);
+            color: #e8e4dd;
+        }
+
+        .closing {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .closing-text {
+            font-size: 1rem;
+            color: #6b6560;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .closing-text em {
+            color: #a89f91;
+            font-style: normal;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>10XY</h1>
+            <p class="subtitle">The real shift isn't speed—it's capability.<br>It's the difference between doing and becoming.</p>
+        </header>
+
+        <div class="visualization-container">
+            <div class="viz-panel x-panel">
+                <div class="panel-label">The old model</div>
+                <div class="panel-title">10x</div>
+                <p class="panel-desc">Optimization along a fixed curve. You move faster, but you're locked to a single axis. The goal is finding the peak—but the terrain never changes.</p>
+                <canvas id="canvas-10x"></canvas>
+                <div class="controls">
+                    <button id="btn-10x-play" class="active">Animate</button>
+                    <button id="btn-10x-reset">Reset</button>
+                </div>
+            </div>
+
+            <div class="viz-panel xy-panel">
+                <div class="panel-label">The new model</div>
+                <div class="panel-title">10XY</div>
+                <p class="panel-desc">The surface itself expands. Each new capability opens a new dimension. You're not just climbing—you're exploring terrain that didn't exist before.</p>
+                <canvas id="canvas-10xy"></canvas>
+                <div class="controls">
+                    <button id="btn-10xy-play" class="active">Animate</button>
+                    <button id="btn-10xy-reset">Reset</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="insight-section">
+            <p class="insight-text">"AI eliminates the friction of becoming."</p>
+        </div>
+
+        <div class="formula-section">
+            <div class="formula-card x">
+                <div class="formula-symbol">X</div>
+                <div class="formula-label">Performance</div>
+                <div class="formula-meaning">Amplification of what you know</div>
+            </div>
+            <div class="formula-card y">
+                <div class="formula-symbol">Y</div>
+                <div class="formula-label">Capability</div>
+                <div class="formula-meaning">Access to what you couldn't</div>
+            </div>
+        </div>
+
+        <div class="closing">
+            <p class="closing-text">Real leverage isn't a longer line.<br>It's an <em>expanding plane</em>.</p>
+        </div>
+    </div>
+
+    <script>
+        // 10x Visualization - Constrained to a line
+        const canvas10x = document.getElementById('canvas-10x');
+        const ctx10x = canvas10x.getContext('2d');
+
+        // 10XY Visualization - Expanding surface
+        const canvas10xy = document.getElementById('canvas-10xy');
+        const ctx10xy = canvas10xy.getContext('2d');
+
+        // High DPI support
+        function setupCanvas(canvas, ctx) {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            return { width: rect.width, height: rect.height };
+        }
+
+        const size10x = setupCanvas(canvas10x, ctx10x);
+        const size10xy = setupCanvas(canvas10xy, ctx10xy);
+
+        // Animation state
+        let animate10x = true;
+        let animate10xy = true;
+        let time = 0;
+        let particlePos10x = 0;
+        let particlePos10xy = { x: 0.5, y: 0.5 };
+        let surfaceExpansion = 0;
+        let trailPoints10xy = [];
+
+        // 10x: Simple 2D curve optimization
+        function draw10x() {
+            const { width, height } = size10x;
+            ctx10x.fillStyle = 'rgba(10, 10, 15, 0.15)';
+            ctx10x.fillRect(0, 0, width, height);
+
+            // Draw the fixed curve
+            ctx10x.beginPath();
+            ctx10x.strokeStyle = 'rgba(196, 149, 106, 0.3)';
+            ctx10x.lineWidth = 2;
+
+            const curveY = (x) => {
+                const normalized = (x - width * 0.1) / (width * 0.8);
+                return height * 0.8 - Math.sin(normalized * Math.PI) * height * 0.5;
+            };
+
+            for (let x = width * 0.1; x <= width * 0.9; x++) {
+                const y = curveY(x);
+                if (x === width * 0.1) ctx10x.moveTo(x, y);
+                else ctx10x.lineTo(x, y);
+            }
+            ctx10x.stroke();
+
+            // Animate particle along curve
+            if (animate10x) {
+                particlePos10x += 0.008;
+                if (particlePos10x > 1) particlePos10x = 0;
+            }
+
+            const px = width * 0.1 + particlePos10x * width * 0.8;
+            const py = curveY(px);
+
+            // Particle glow
+            const gradient = ctx10x.createRadialGradient(px, py, 0, px, py, 30);
+            gradient.addColorStop(0, 'rgba(196, 149, 106, 0.8)');
+            gradient.addColorStop(0.5, 'rgba(196, 149, 106, 0.2)');
+            gradient.addColorStop(1, 'transparent');
+            ctx10x.fillStyle = gradient;
+            ctx10x.fillRect(px - 30, py - 30, 60, 60);
+
+            // Particle
+            ctx10x.beginPath();
+            ctx10x.arc(px, py, 6, 0, Math.PI * 2);
+            ctx10x.fillStyle = '#c4956a';
+            ctx10x.fill();
+
+            // Axis label
+            ctx10x.font = '11px Space Mono';
+            ctx10x.fillStyle = 'rgba(196, 149, 106, 0.5)';
+            ctx10x.fillText('PERFORMANCE →', width * 0.1, height - 20);
+        }
+
+        // 10XY: Expanding 3D surface
+        function draw10xy() {
+            const { width, height } = size10xy;
+            ctx10xy.fillStyle = 'rgba(10, 10, 15, 0.1)';
+            ctx10xy.fillRect(0, 0, width, height);
+
+            if (animate10xy) {
+                surfaceExpansion = Math.min(surfaceExpansion + 0.005, 1);
+                time += 0.02;
+            }
+
+            const centerX = width * 0.5;
+            const centerY = height * 0.55;
+            const scale = Math.min(width, height) * 0.35 * (0.3 + surfaceExpansion * 0.7);
+
+            // Isometric projection helpers
+            const isoX = (x, y) => centerX + (x - y) * 0.866 * scale;
+            const isoY = (x, y, z) => centerY + (x + y) * 0.5 * scale - z * scale;
+
+            // Surface height function (evolving landscape)
+            const surfaceZ = (x, y) => {
+                const d = Math.sqrt(x * x + y * y);
+                const wave1 = Math.sin(d * 3 - time) * 0.3;
+                const wave2 = Math.cos(x * 2 + time * 0.5) * Math.sin(y * 2 - time * 0.3) * 0.2;
+                const peak = Math.exp(-d * d * 2) * 0.5;
+                return (wave1 + wave2 + peak) * surfaceExpansion;
+            };
+
+            // Draw grid surface
+            const gridSize = 20;
+            const gridRange = 1.2;
+
+            ctx10xy.strokeStyle = `rgba(122, 184, 168, ${0.15 * surfaceExpansion})`;
+            ctx10xy.lineWidth = 1;
+
+            // Draw grid lines
+            for (let i = 0; i <= gridSize; i++) {
+                const t = (i / gridSize) * 2 - 1;
+
+                // Lines along X
+                ctx10xy.beginPath();
+                for (let j = 0; j <= gridSize; j++) {
+                    const s = (j / gridSize) * 2 - 1;
+                    const x = t * gridRange;
+                    const y = s * gridRange;
+                    const z = surfaceZ(x, y);
+                    const px = isoX(x, y);
+                    const py = isoY(x, y, z);
+                    if (j === 0) ctx10xy.moveTo(px, py);
+                    else ctx10xy.lineTo(px, py);
+                }
+                ctx10xy.stroke();
+
+                // Lines along Y
+                ctx10xy.beginPath();
+                for (let j = 0; j <= gridSize; j++) {
+                    const s = (j / gridSize) * 2 - 1;
+                    const x = s * gridRange;
+                    const y = t * gridRange;
+                    const z = surfaceZ(x, y);
+                    const px = isoX(x, y);
+                    const py = isoY(x, y, z);
+                    if (j === 0) ctx10xy.moveTo(px, py);
+                    else ctx10xy.lineTo(px, py);
+                }
+                ctx10xy.stroke();
+            }
+
+            // Animate particle exploring the surface
+            if (animate10xy) {
+                particlePos10xy.x += (Math.sin(time * 0.7) * 0.01 + Math.cos(time * 0.3) * 0.005);
+                particlePos10xy.y += (Math.cos(time * 0.5) * 0.01 + Math.sin(time * 0.4) * 0.005);
+
+                // Keep in bounds with wrapping exploration
+                if (Math.abs(particlePos10xy.x) > 1) particlePos10xy.x *= 0.9;
+                if (Math.abs(particlePos10xy.y) > 1) particlePos10xy.y *= 0.9;
+
+                // Add to trail
+                trailPoints10xy.push({ ...particlePos10xy, time: time });
+                if (trailPoints10xy.length > 100) trailPoints10xy.shift();
+            }
+
+            // Draw trail
+            ctx10xy.beginPath();
+            trailPoints10xy.forEach((p, i) => {
+                const z = surfaceZ(p.x, p.y);
+                const px = isoX(p.x, p.y);
+                const py = isoY(p.x, p.y, z);
+                const alpha = (i / trailPoints10xy.length) * 0.6;
+
+                if (i === 0) {
+                    ctx10xy.moveTo(px, py);
+                } else {
+                    ctx10xy.lineTo(px, py);
+                }
+            });
+            ctx10xy.strokeStyle = 'rgba(122, 184, 168, 0.4)';
+            ctx10xy.lineWidth = 2;
+            ctx10xy.stroke();
+
+            // Draw particle
+            const pz = surfaceZ(particlePos10xy.x, particlePos10xy.y);
+            const ppx = isoX(particlePos10xy.x, particlePos10xy.y);
+            const ppy = isoY(particlePos10xy.x, particlePos10xy.y, pz);
+
+            // Particle glow
+            const gradient = ctx10xy.createRadialGradient(ppx, ppy, 0, ppx, ppy, 35);
+            gradient.addColorStop(0, 'rgba(122, 184, 168, 0.9)');
+            gradient.addColorStop(0.4, 'rgba(122, 184, 168, 0.3)');
+            gradient.addColorStop(1, 'transparent');
+            ctx10xy.fillStyle = gradient;
+            ctx10xy.fillRect(ppx - 35, ppy - 35, 70, 70);
+
+            // Particle
+            ctx10xy.beginPath();
+            ctx10xy.arc(ppx, ppy, 7, 0, Math.PI * 2);
+            ctx10xy.fillStyle = '#7ab8a8';
+            ctx10xy.fill();
+
+            // Axis labels
+            ctx10xy.font = '11px Space Mono';
+            ctx10xy.fillStyle = 'rgba(122, 184, 168, 0.5)';
+            ctx10xy.fillText('PERFORMANCE →', width * 0.65, height - 15);
+            ctx10xy.fillText('↑ CAPABILITY', 15, height * 0.3);
+        }
+
+        // Animation loop
+        function animate() {
+            draw10x();
+            draw10xy();
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        // Controls
+        document.getElementById('btn-10x-play').addEventListener('click', function() {
+            animate10x = !animate10x;
+            this.textContent = animate10x ? 'Pause' : 'Play';
+            this.classList.toggle('active', animate10x);
+        });
+
+        document.getElementById('btn-10x-reset').addEventListener('click', function() {
+            particlePos10x = 0;
+        });
+
+        document.getElementById('btn-10xy-play').addEventListener('click', function() {
+            animate10xy = !animate10xy;
+            this.textContent = animate10xy ? 'Pause' : 'Play';
+            this.classList.toggle('active', animate10xy);
+        });
+
+        document.getElementById('btn-10xy-reset').addEventListener('click', function() {
+            surfaceExpansion = 0;
+            particlePos10xy = { x: 0.5, y: 0.5 };
+            trailPoints10xy = [];
+            time = 0;
+        });
+
+        // Resize handling
+        window.addEventListener('resize', () => {
+            Object.assign(size10x, setupCanvas(canvas10x, ctx10x));
+            Object.assign(size10xy, setupCanvas(canvas10xy, ctx10xy));
+        });
+    </script>
+</body>
+</html>

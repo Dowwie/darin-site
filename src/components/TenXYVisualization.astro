@@ -1,0 +1,346 @@
+---
+// Interactive 10x vs 10XY visualization - refined, compact version
+---
+
+<div class="tenxy-viz">
+    <div class="viz-comparison">
+        <div class="viz-side viz-10x">
+            <span class="viz-label">10x</span>
+            <canvas id="canvas-10x"></canvas>
+        </div>
+        <div class="viz-divider">
+            <span class="viz-vs">vs</span>
+        </div>
+        <div class="viz-side viz-10xy">
+            <span class="viz-label">10xy</span>
+            <canvas id="canvas-10xy"></canvas>
+        </div>
+    </div>
+    <p class="viz-caption">
+        <span class="caption-left">Optimization along a fixed curve</span>
+        <span class="caption-right">The surface itself expands</span>
+    </p>
+</div>
+
+<style>
+    .tenxy-viz {
+        margin: 3rem 0 4rem;
+    }
+
+    .viz-comparison {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        max-width: 100%;
+    }
+
+    .viz-side {
+        flex: 1;
+        position: relative;
+    }
+
+    .viz-label {
+        position: absolute;
+        top: 0.75rem;
+        left: 0.75rem;
+        font-family: ui-serif, Georgia, Cambria, serif;
+        font-size: 1.25rem;
+        font-weight: 400;
+        z-index: 2;
+        opacity: 0.9;
+    }
+
+    .viz-10x .viz-label { color: #ff2a6d; }
+    .viz-10xy .viz-label { color: #05d9e8; }
+
+    .viz-divider {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 3rem;
+        flex-shrink: 0;
+    }
+
+    .viz-vs {
+        font-family: ui-serif, Georgia, Cambria, serif;
+        font-style: italic;
+        font-size: 0.875rem;
+        color: var(--theme-text-muted, #6b6560);
+        opacity: 0.6;
+    }
+
+    canvas {
+        width: 100%;
+        height: 200px;
+        border-radius: 0.5rem;
+        background: rgba(0, 0, 0, 0.25);
+        display: block;
+    }
+
+    .viz-caption {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 0.75rem;
+        padding: 0 0.25rem;
+        font-size: 0.75rem;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        letter-spacing: 0.02em;
+        color: var(--theme-text-muted, #6b6560);
+        opacity: 0.7;
+    }
+
+    .caption-left { text-align: left; }
+    .caption-right { text-align: right; }
+
+    @media (max-width: 600px) {
+        .viz-comparison {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .viz-divider {
+            width: 100%;
+            height: 2rem;
+        }
+        .viz-caption {
+            flex-direction: column;
+            gap: 0.25rem;
+            text-align: center;
+        }
+        .caption-left, .caption-right { text-align: center; }
+    }
+</style>
+
+<script>
+    const canvas10x = document.getElementById('canvas-10x') as HTMLCanvasElement;
+    const ctx10x = canvas10x.getContext('2d')!;
+    const canvas10xy = document.getElementById('canvas-10xy') as HTMLCanvasElement;
+    const ctx10xy = canvas10xy.getContext('2d')!;
+
+    function setupCanvas(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        return { width: rect.width, height: rect.height };
+    }
+
+    let size10x = setupCanvas(canvas10x, ctx10x);
+    let size10xy = setupCanvas(canvas10xy, ctx10xy);
+
+    let time = 0;
+    let particlePos10x = 0;
+    let particlePos10xy = { x: 0.5, y: 0.5 };
+    let surfaceExpansion = 0;
+    let trailPoints10xy: Array<{ x: number; y: number; time: number }> = [];
+
+    function draw10x() {
+        const { width, height } = size10x;
+        ctx10x.fillStyle = 'rgba(10, 10, 15, 0.15)';
+        ctx10x.fillRect(0, 0, width, height);
+
+        const originX = width * 0.12;
+        const originY = height * 0.85;
+        const axisLength = width * 0.75;
+        const axisHeight = height * 0.7;
+
+        // Draw Y axis
+        ctx10x.beginPath();
+        ctx10x.strokeStyle = 'rgba(255, 42, 109, 0.3)';
+        ctx10x.lineWidth = 2;
+        ctx10x.moveTo(originX, originY);
+        ctx10x.lineTo(originX, originY - axisHeight);
+        ctx10x.stroke();
+
+        // Draw X axis
+        ctx10x.beginPath();
+        ctx10x.moveTo(originX, originY);
+        ctx10x.lineTo(originX + axisLength, originY);
+        ctx10x.stroke();
+
+        // Draw grid lines
+        ctx10x.strokeStyle = 'rgba(255, 42, 109, 0.08)';
+        ctx10x.lineWidth = 1;
+        for (let i = 1; i <= 5; i++) {
+            const y = originY - (i / 5) * axisHeight;
+            ctx10x.beginPath();
+            ctx10x.moveTo(originX, y);
+            ctx10x.lineTo(originX + axisLength, y);
+            ctx10x.stroke();
+
+            const x = originX + (i / 5) * axisLength;
+            ctx10x.beginPath();
+            ctx10x.moveTo(x, originY);
+            ctx10x.lineTo(x, originY - axisHeight);
+            ctx10x.stroke();
+        }
+
+        // Animate progress along the linear growth line
+        particlePos10x += 0.003;
+        if (particlePos10x > 1) particlePos10x = 0;
+
+        // Draw the linear growth line (y = x, scaled)
+        ctx10x.beginPath();
+        ctx10x.strokeStyle = 'rgba(255, 42, 109, 0.4)';
+        ctx10x.lineWidth = 2;
+        ctx10x.setLineDash([5, 5]);
+        ctx10x.moveTo(originX, originY);
+        ctx10x.lineTo(originX + axisLength, originY - axisHeight);
+        ctx10x.stroke();
+        ctx10x.setLineDash([]);
+
+        // Draw the progress line - solid up to current point
+        const currentX = originX + particlePos10x * axisLength;
+        const currentY = originY - particlePos10x * axisHeight;
+
+        ctx10x.beginPath();
+        ctx10x.strokeStyle = 'rgba(255, 42, 109, 0.7)';
+        ctx10x.lineWidth = 3;
+        ctx10x.moveTo(originX, originY);
+        ctx10x.lineTo(currentX, currentY);
+        ctx10x.stroke();
+
+        // Particle glow
+        const gradient = ctx10x.createRadialGradient(currentX, currentY, 0, currentX, currentY, 30);
+        gradient.addColorStop(0, 'rgba(255, 42, 109, 0.8)');
+        gradient.addColorStop(0.5, 'rgba(255, 42, 109, 0.2)');
+        gradient.addColorStop(1, 'transparent');
+        ctx10x.fillStyle = gradient;
+        ctx10x.fillRect(currentX - 30, currentY - 30, 60, 60);
+
+        // Particle
+        ctx10x.beginPath();
+        ctx10x.arc(currentX, currentY, 6, 0, Math.PI * 2);
+        ctx10x.fillStyle = '#ff2a6d';
+        ctx10x.fill();
+
+        // Multiplier label
+        const multiplier = (1 + particlePos10x * 9).toFixed(1);
+        ctx10x.font = '20px ui-serif, Georgia, serif';
+        ctx10x.fillStyle = 'rgba(255, 42, 109, 0.9)';
+        ctx10x.textAlign = 'center';
+        ctx10x.fillText(multiplier + 'x', currentX + 25, currentY - 15);
+        ctx10x.textAlign = 'left';
+
+        // Axis labels
+        ctx10x.font = '11px ui-monospace, monospace';
+        ctx10x.fillStyle = 'rgba(255, 42, 109, 0.5)';
+        ctx10x.fillText('INPUT →', originX + axisLength * 0.4, originY + 25);
+
+        ctx10x.save();
+        ctx10x.translate(originX - 20, originY - axisHeight * 0.5);
+        ctx10x.rotate(-Math.PI / 2);
+        ctx10x.fillText('OUTPUT →', 0, 0);
+        ctx10x.restore();
+    }
+
+    function draw10xy() {
+        const { width, height } = size10xy;
+        ctx10xy.fillStyle = 'rgba(10, 10, 15, 0.08)';
+        ctx10xy.fillRect(0, 0, width, height);
+
+        surfaceExpansion = Math.min(surfaceExpansion + 0.004, 1);
+        time += 0.015;
+
+        const centerX = width * 0.5;
+        const centerY = height * 0.55;
+        const scale = Math.min(width, height) * 0.32 * (0.3 + surfaceExpansion * 0.7);
+
+        const isoX = (x: number, y: number) => centerX + (x - y) * 0.866 * scale;
+        const isoY = (x: number, y: number, z: number) => centerY + (x + y) * 0.5 * scale - z * scale;
+
+        const surfaceZ = (x: number, y: number) => {
+            const d = Math.sqrt(x * x + y * y);
+            const wave1 = Math.sin(d * 3 - time) * 0.25;
+            const wave2 = Math.cos(x * 2 + time * 0.5) * Math.sin(y * 2 - time * 0.3) * 0.15;
+            const peak = Math.exp(-d * d * 2) * 0.4;
+            return (wave1 + wave2 + peak) * surfaceExpansion;
+        };
+
+        const gridSize = 16;
+        const gridRange = 1.1;
+
+        ctx10xy.strokeStyle = `rgba(5, 217, 232, ${0.12 * surfaceExpansion})`;
+        ctx10xy.lineWidth = 1;
+
+        for (let i = 0; i <= gridSize; i++) {
+            const t = (i / gridSize) * 2 - 1;
+
+            ctx10xy.beginPath();
+            for (let j = 0; j <= gridSize; j++) {
+                const s = (j / gridSize) * 2 - 1;
+                const x = t * gridRange;
+                const y = s * gridRange;
+                const z = surfaceZ(x, y);
+                const px = isoX(x, y);
+                const py = isoY(x, y, z);
+                if (j === 0) ctx10xy.moveTo(px, py);
+                else ctx10xy.lineTo(px, py);
+            }
+            ctx10xy.stroke();
+
+            ctx10xy.beginPath();
+            for (let j = 0; j <= gridSize; j++) {
+                const s = (j / gridSize) * 2 - 1;
+                const x = s * gridRange;
+                const y = t * gridRange;
+                const z = surfaceZ(x, y);
+                const px = isoX(x, y);
+                const py = isoY(x, y, z);
+                if (j === 0) ctx10xy.moveTo(px, py);
+                else ctx10xy.lineTo(px, py);
+            }
+            ctx10xy.stroke();
+        }
+
+        particlePos10xy.x += Math.sin(time * 0.7) * 0.008 + Math.cos(time * 0.3) * 0.004;
+        particlePos10xy.y += Math.cos(time * 0.5) * 0.008 + Math.sin(time * 0.4) * 0.004;
+
+        if (Math.abs(particlePos10xy.x) > 1) particlePos10xy.x *= 0.9;
+        if (Math.abs(particlePos10xy.y) > 1) particlePos10xy.y *= 0.9;
+
+        trailPoints10xy.push({ ...particlePos10xy, time });
+        if (trailPoints10xy.length > 80) trailPoints10xy.shift();
+
+        ctx10xy.beginPath();
+        trailPoints10xy.forEach((p, i) => {
+            const z = surfaceZ(p.x, p.y);
+            const px = isoX(p.x, p.y);
+            const py = isoY(p.x, p.y, z);
+            if (i === 0) ctx10xy.moveTo(px, py);
+            else ctx10xy.lineTo(px, py);
+        });
+        ctx10xy.strokeStyle = 'rgba(5, 217, 232, 0.35)';
+        ctx10xy.lineWidth = 1.5;
+        ctx10xy.stroke();
+
+        const pz = surfaceZ(particlePos10xy.x, particlePos10xy.y);
+        const ppx = isoX(particlePos10xy.x, particlePos10xy.y);
+        const ppy = isoY(particlePos10xy.x, particlePos10xy.y, pz);
+
+        const gradient = ctx10xy.createRadialGradient(ppx, ppy, 0, ppx, ppy, 28);
+        gradient.addColorStop(0, 'rgba(5, 217, 232, 0.8)');
+        gradient.addColorStop(0.4, 'rgba(5, 217, 232, 0.2)');
+        gradient.addColorStop(1, 'transparent');
+        ctx10xy.fillStyle = gradient;
+        ctx10xy.fillRect(ppx - 28, ppy - 28, 56, 56);
+
+        ctx10xy.beginPath();
+        ctx10xy.arc(ppx, ppy, 5, 0, Math.PI * 2);
+        ctx10xy.fillStyle = '#05d9e8';
+        ctx10xy.fill();
+    }
+
+    function animationLoop() {
+        draw10x();
+        draw10xy();
+        requestAnimationFrame(animationLoop);
+    }
+
+    animationLoop();
+
+    window.addEventListener('resize', () => {
+        size10x = setupCanvas(canvas10x, ctx10x);
+        size10xy = setupCanvas(canvas10xy, ctx10xy);
+    });
+</script>
