@@ -1,6 +1,6 @@
 ---
 title: "Vibes That Scale"
-publishDate: "08 December 2024"
+publishDate: "08 December 2025"
 description: "A protocol for turning specifications into executable task graphs"
 tags: ["agentic_development"]
 draft: true

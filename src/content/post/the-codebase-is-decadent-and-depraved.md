@@ -1,6 +1,6 @@
 ---
 title: "The Codebase Is Decadent and Depraved"
-publishDate: "26 November 2024"
+publishDate: "26 November 2025"
 description: "Fear and Loathing at the AIE Code Summit. A gonzo dispatch from the frontlines of Gonzo Engineering, where the Old Guard watches their craft burn."
 tags: ["ai", "engineering", "gonzo"]
 pinned: true
