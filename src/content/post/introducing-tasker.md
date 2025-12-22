@@ -6,7 +6,7 @@ tags: ["ai", "engineering"]
 ---
 
 <div align="center">
-<img src="https://github.com/Dowwie/tasker/blob/main/assets/logo.jpg" alt="Logo" width="100%" style="display: block; margin-top: 0; margin-bottom: 0; max-width: 100%;"/>
+<img src="https://raw.githubusercontent.com/Dowwie/tasker/main/assets/logo.jpg" alt="Logo" width="100%" style="display: block; margin-top: 0; margin-bottom: 0; max-width: 100%;"/>
 </div>
 
 
